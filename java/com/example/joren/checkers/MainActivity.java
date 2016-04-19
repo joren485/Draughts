@@ -1,11 +1,8 @@
-package com.example.joren.test4;
+package com.example.joren.checkers;
 
-import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.GridLayout;
 import android.widget.GridView;
-import android.widget.ImageView;
 
 public class MainActivity extends AppCompatActivity {
 

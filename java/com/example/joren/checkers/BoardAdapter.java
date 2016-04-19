@@ -1,12 +1,10 @@
-package com.example.joren.test4;
+package com.example.joren.checkers;
 
 import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
-import android.widget.ImageView;
 
 /**
  * Created by Joren on 18-Apr-16.

@@ -1,4 +1,4 @@
-package com.example.joren.test4;
+package com.example.joren.checkers;
 
 import android.content.Context;
 import android.util.AttributeSet;
