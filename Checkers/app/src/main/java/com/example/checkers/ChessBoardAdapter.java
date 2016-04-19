@@ -42,10 +42,14 @@ public class ChessBoardAdapter extends BaseAdapter{
         } else {
             mView = (SquareView) convertView;
         }
-        //image.setPadding(0, 0, 0, 0);
         mView.setBackgroundResource((position + position/12) % 2 == 0 ? BEIGE : BROWN);
-        //mView.setImageResource((position + position/12) % 2 == 0 ? BEIGE : BROWN);
-        //square.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        mView.setPadding(5, 5, 5, 5);
+        if ((position + position/12) % 2 == 0) {
+            if (position < 48)
+                mView.setImageResource(R.drawable.black);
+            else if (position >= 96)
+                mView.setImageResource(R.drawable.white);
+        }
 
         return mView;
     }
