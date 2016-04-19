@@ -13,14 +13,16 @@ public class ChessBoardAdapter extends BaseAdapter{
     private final Context context;
     private static final int BROWN = R.drawable.brown;
     private static final int BEIGE = R.drawable.beige;
+    private final int columnAmount;
 
-    public ChessBoardAdapter(Context c) {
+    public ChessBoardAdapter(Context c, int columns) {
         context = c;
+        this.columnAmount = columns;
     }
 
     @Override
     public int getCount() {
-        return 144;
+        return columnAmount * columnAmount;
     }
 
     @Override
@@ -42,12 +44,12 @@ public class ChessBoardAdapter extends BaseAdapter{
         } else {
             mView = (SquareView) convertView;
         }
-        mView.setBackgroundResource((position + position/12) % 2 == 0 ? BEIGE : BROWN);
+        mView.setBackgroundResource((position + position/columnAmount) % 2 == 0 ? BEIGE : BROWN);
         mView.setPadding(5, 5, 5, 5);
-        if ((position + position/12) % 2 == 0) {
-            if (position < 48)
+        if ((position + position/columnAmount) % 2 == 0) {
+            if (position < 4*columnAmount)
                 mView.setImageResource(R.drawable.black);
-            else if (position >= 96)
+            else if (position >= (columnAmount - 4) * columnAmount)
                 mView.setImageResource(R.drawable.white);
         }
 
