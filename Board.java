@@ -1,5 +1,3 @@
-import javafx.scene.paint.Color;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +8,6 @@ public class Board {
 
     private final int board_size;
     private final Tile[][] board;
-
 
     public Board(int size){
         this.board_size = size;
@@ -46,12 +43,15 @@ public class Board {
     public List<Tile> Moves(Piece piece){
         List<Tile> moves = new ArrayList<>();
 
+        Tuple[] move_dirs = new Tuple[2];
         if (piece.getColor() == Piece.PieceColor.Black){
-            Tuple[] move_dirs = {new Tuple(1,1), new Tuple(-1,1)};
+            move_dirs[0] = new Tuple(1,1);
+            move_dirs[1] = new Tuple(-1,1);
         }
 
         else{
-            Tuple[] move_dirs = {new Tuple(1,-1), new Tuple(-1,-1)};
+            move_dirs[0] = new Tuple(1,-1);
+            move_dirs[1] = new Tuple(-1,-1);
         }
 
         Tile t;
@@ -73,9 +73,7 @@ public class Board {
 
     public void movePiece(Piece p, Tile destTile){
 
-
         Tile from_tile = this.board[p.getX()][p.getY()];
-
         destTile.setPiece(p, new Tuple(p.getX(), p.getY()));
         from_tile.setEmpty();
     }
