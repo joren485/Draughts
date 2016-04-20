@@ -35,7 +35,7 @@ public class Piece {
         return this.King;
     }
 
-    public void Crown(){
+    public void crown(){
         this.King = true;
     }
 
@@ -49,6 +49,10 @@ public class Piece {
 
     public int getY(){
         return this.position.y;
+    }
+
+    public Tuple getPosition(){
+        return this.position;
     }
 
 }

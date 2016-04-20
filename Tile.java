@@ -27,8 +27,8 @@ public class Tile {
         return this.piece;
     }
 
-    public void setPiece(Piece p, Tuple pos){
-        this.piece = new Piece(p, pos);
+    public void setPiece(Piece p){
+        this.piece = new Piece(p, this.position);
     }
 
     public void setEmpty(){
@@ -45,5 +45,14 @@ public class Tile {
 
     public int getY(){
         return this.position.y;
+    }
+
+    public Tuple getPosition(){
+        return this.position;
+    }
+
+    @Override
+    public String toString(){
+        return "( " + this.position.x + ", " + this.position.y + " )";
     }
 }

@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Math.abs;
+
 /**
  * Created by Joren on 20-Apr-16.
  */
@@ -39,8 +41,34 @@ public class Board {
         // Default size is 10
         this(10);
     }
+    public Tile getTile(Tuple pos){
+        return this.board[pos.x][pos.y];
+    }
 
-    public List<Tile> Moves(Piece piece){
+    public List<Tile> getPossibleCaptures(Piece piece){
+        List<Tile> captures = new ArrayList<>();
+        Tuple[] move_dirs = {new Tuple(1,1), new Tuple(-1,1), new Tuple(1,-1), new Tuple(-1,-1)};
+
+        for (Tuple move_dir: move_dirs) {
+
+            Tuple cor = new Tuple(piece.getX() + move_dir.x, piece.getY() + move_dir.y);
+            Tuple cor_behind = new Tuple(piece.getX() + 2* move_dir.x, piece.getY() + 2* move_dir.y);
+
+            if (cor.x < this.board_size && cor.x >= 0 && cor.y < this.board_size && cor.y >= 0 &&
+                    cor_behind.x < this.board_size && cor_behind.x >= 0 && cor_behind.y < this.board_size && cor_behind.y >= 0){
+
+                Tile t = this.board[cor.x][cor.y];
+                Tile t_behind = this.board[cor_behind.x][cor_behind.y];
+
+                if (t.getPiece().getColor() != piece.getColor() && t_behind.isEmpty()){
+                    captures.add(t_behind);
+                }
+            }
+        }
+            return captures;
+    }
+
+    public List<Tile> getPossibleMoves(Piece piece){
         List<Tile> moves = new ArrayList<>();
 
         Tuple[] move_dirs = new Tuple[2];
@@ -54,14 +82,12 @@ public class Board {
             move_dirs[1] = new Tuple(-1,-1);
         }
 
-        Tile t;
-        Tuple cor;
         for (Tuple move_dir: move_dirs){
 
-            cor = new Tuple(piece.getX() + move_dir.x, piece.getY() + move_dir.y);
+            Tuple cor = new Tuple(piece.getX() + move_dir.x, piece.getY() + move_dir.y);
 
             if (cor.x < this.board_size && cor.x >= 0 && cor.y < this.board_size && cor.y >= 0){
-                t = this.board[cor.x][cor.y];
+                Tile t = this.board[cor.x][cor.y];
 
                 if(t.isEmpty())
                     moves.add(t);
@@ -71,13 +97,28 @@ public class Board {
         return moves;
     }
 
-    public void movePiece(Piece p, Tile destTile){
+    /**
+     * Move a piece to a location. It is assumed that the move is a valid one,
+     * there are methods for all valid moves and captures.
+     */
+    public void movePiece(Tile srcTile, Tile destTile){
 
-        Tile from_tile = this.board[p.getX()][p.getY()];
-        destTile.setPiece(p, new Tuple(p.getX(), p.getY()));
-        from_tile.setEmpty();
+        Piece p = srcTile.getPiece();
+        destTile.setPiece(p);
+        srcTile.setEmpty();
+
+        if (abs(destTile.getX() - srcTile.getX()) > 1 && abs(destTile.getY() - srcTile.getY()) > 1){
+            Tuple dir = Tuple.getDirection(srcTile.getPosition(), destTile.getPosition());
+
+            Tile new_empty_tile = this.getTile(new Tuple(destTile.getX() + dir.x, destTile.getY() + dir.y));
+
+            new_empty_tile.setEmpty();
+        }
     }
 
+    public void movePiece(Tuple srcCor, Tuple destCor){
+        this.movePiece(this.getTile(srcCor), this.getTile(destCor));
+    }
 
     @Override
     public String toString(){
@@ -90,7 +131,7 @@ public class Board {
                 temp = this.board[x][y];
 
                 if (temp.isEmpty()) {
-                    sb.append("   ");
+                    sb.append(" - ");
                 }
 
                 else if (temp.getPiece().getColor() == Piece.PieceColor.White){
