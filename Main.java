@@ -6,8 +6,6 @@ public class Main {
 
         Board b = new Board(10);
 
-        b.movePiece(new Tuple(0, 3), new Tuple(1, 4));
-
         System.out.println(b);
     }
 }

@@ -20,18 +20,17 @@ public class Board {
             for (int x = 0; x < this.board_size; x++){
 
                 if ((x + y) % 2 == 0) {
-                    this.board[x][y] = new Tile(Tile.TileColor.Beige, null);
+                    this.board[x][y] = new Tile(Tile.TileColor.Beige, null, new Tuple(x,y));
                 }
                 else{
-
                     if (y < (this.board_size/2) - 1){
-                        this.board[x][y] = new Tile(Tile.TileColor.Brown, new Piece(Piece.PieceColor.Black));
+                        this.board[x][y] = new Tile(Tile.TileColor.Brown, new Piece(Piece.PieceColor.Black, new Tuple(x, y)), new Tuple(x,y));
                     }
                     else if (y >= this.board_size - ((this.board_size/2) - 1)){
-                        this.board[x][y] = new Tile(Tile.TileColor.Brown, new Piece(Piece.PieceColor.White));
+                        this.board[x][y] = new Tile(Tile.TileColor.Brown, new Piece(Piece.PieceColor.White, new Tuple(x, y)), new Tuple(x,y));
                     }
                     else {
-                        this.board[x][y] = new Tile(Tile.TileColor.Brown, null);
+                        this.board[x][y] = new Tile(Tile.TileColor.Brown, null, new Tuple(x,y));
                     }
                 }
             }
@@ -44,48 +43,41 @@ public class Board {
         this(10);
     }
 
-    public boolean legalmove(Tuple from, Tuple to){
+    public List<Tile> Moves(Piece piece){
+        List<Tile> moves = new ArrayList<>();
 
-        Tile to_tile = this.board[to.x][to.y];
-
-        if(!to_tile.isEmpty()){
-            return false;
-        }
-
-        Tile from_tile = this.board[from.x][from.y];
-
-
-        if (to_tile.getPiece().isKing()){
-
+        if (piece.getColor() == Piece.PieceColor.Black){
+            Tuple[] move_dirs = {new Tuple(1,1), new Tuple(-1,1)};
         }
 
         else{
-
+            Tuple[] move_dirs = {new Tuple(1,-1), new Tuple(-1,-1)};
         }
 
-        return true;
-    }
+        Tile t;
+        Tuple cor;
+        for (Tuple move_dir: move_dirs){
 
-    public List<Tuple> allLegalMoves(Tuple from){
-        List<Tuple> moves = new ArrayList<>();
+            cor = new Tuple(piece.getX() + move_dir.x, piece.getY() + move_dir.y);
 
+            if (cor.x < this.board_size && cor.x >= 0 && cor.y < this.board_size && cor.y >= 0){
+                t = this.board[cor.x][cor.y];
 
-
+                if(t.isEmpty())
+                    moves.add(t);
+            }
+        }
 
         return moves;
     }
 
-    public void movePiece(Tuple from, Tuple to){
+    public void movePiece(Piece p, Tile destTile){
 
-        Tile from_tile = this.board[from.x][from.y];
-        Tile to_tile = this.board[to.x][to.y];
 
-        to_tile.setPiece(from_tile.getPiece());
+        Tile from_tile = this.board[p.getX()][p.getY()];
+
+        destTile.setPiece(p, new Tuple(p.getX(), p.getY()));
         from_tile.setEmpty();
-
-        if ((to_tile.getPiece().getColor() == Piece.PieceColor.White && to.y == this.board_size - 1) || (to_tile.getPiece().getColor() == Piece.PieceColor.Black && to.y == 0)){
-            to_tile.getPiece().makeKing();
-        }
     }
 
 
