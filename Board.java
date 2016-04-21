@@ -8,6 +8,8 @@ import static java.lang.Math.abs;
  */
 public class Board {
 
+    private final Tuple[] KINGMOVES;
+
     private final int board_size;
     private final Tile[][] board;
 
@@ -34,6 +36,15 @@ public class Board {
                 }
             }
         }
+
+        this.KINGMOVES = new Tuple[this.board_size * this.board_size];
+        int index = 0;
+        for(int x = -1*(this.board_size - 1); x < this.board_size; x++){
+            for(int y = -1*(this.board_size - 1); y < this.board_size; y++){
+                this.KINGMOVES[index] = new Tuple(x, y);
+            }
+        }
+
     }
 
     public Board(){
@@ -47,9 +58,22 @@ public class Board {
 
     private List<Tile> getPossibleCaptures(Piece piece){
         List<Tile> captures = new ArrayList<>();
-        Tuple[] move_dirs = {new Tuple(1,1), new Tuple(-1,1), new Tuple(1,-1), new Tuple(-1,-1)};
 
-        for (Tuple move_dir: move_dirs) {
+        Tuple[] moves;
+
+        if (piece.isKing()){
+            moves = this.KINGMOVES;
+        }
+
+        else{
+            moves = new Tuple[4];
+            moves[0] = new Tuple(1,1);
+            moves[1] = new Tuple(-1,1);
+            moves[2] = new Tuple(1,-1);
+            moves[3] = new Tuple(-1,-1);
+        }
+
+        for (Tuple move_dir: moves) {
 
             Tuple cor = new Tuple(piece.getX() + move_dir.x, piece.getY() + move_dir.y);
             Tuple cor_behind = new Tuple(piece.getX() + 2* move_dir.x, piece.getY() + 2* move_dir.y);
@@ -71,16 +95,23 @@ public class Board {
     private List<Tile> getPossibleMoves(Piece piece){
         List<Tile> moves = new ArrayList<>();
 
-        Tuple[] move_dirs = new Tuple[2];
-        if (piece.getColor() == Piece.PieceColor.Black){
-            move_dirs[0] = new Tuple(1,1);
-            move_dirs[1] = new Tuple(-1,1);
+        Tuple[] move_dirs;
+        if (piece.isKing()){
+            move_dirs = this.KINGMOVES;
+        }
+        else{
+            move_dirs = new Tuple[2];
+            if (piece.getColor() == Piece.PieceColor.Black){
+                move_dirs[0] = new Tuple(1,1);
+                move_dirs[1] = new Tuple(-1,1);
+            }
+
+            else{
+                move_dirs[0] = new Tuple(1,-1);
+                move_dirs[1] = new Tuple(-1,-1);
+            }
         }
 
-        else{
-            move_dirs[0] = new Tuple(1,-1);
-            move_dirs[1] = new Tuple(-1,-1);
-        }
 
         for (Tuple move_dir: move_dirs){
 
@@ -97,18 +128,31 @@ public class Board {
         return moves;
     }
 
-    public Move getLegalMoves(Piece piece){
-        List<Tile> caputeres = getPossibleCaptures(piece);
+    public Move getLegalMoves(Piece piece, Move node){
 
-        // If no captures are possible, return a
-        if (caputeres.size() == 0){
-            Move end = new Move(piece.getPosition());
+        List<Tile> captures = getPossibleCaptures(piece);
+
+        if (captures.size() == 0){
+
             for(Tile t: getPossibleMoves(piece)){
-                end.addMove(new Move(t.getPosition()));
+                node.addMove(new Move(t.getPosition()));
             }
-            return end;
         }
 
+        for(Tile dest: captures){
+
+            Tuple src = piece.getPosition();
+            this.movePiece(src, dest.getPosition());
+
+            node.addMove(getLegalMoves(piece, node));
+            this.movePiece(dest.getPosition(), src);
+        }
+
+        return node;
+    }
+
+    public Move getLegalMoves(Piece piece){
+        return getLegalMoves(piece, new Move(piece.getPosition()));
     }
 
     /**
@@ -121,11 +165,19 @@ public class Board {
         destTile.setPiece(p);
         srcTile.setEmpty();
 
-        if (abs(destTile.getX() - srcTile.getX()) > 1 && abs(destTile.getY() - srcTile.getY()) > 1){
-            Tuple dir = Tuple.getDirection(srcTile.getPosition(), destTile.getPosition());
 
-            Tile new_empty_tile = this.getTile(new Tuple(destTile.getX() + dir.x, destTile.getY() + dir.y));
-        }
+        //TODO This code needs to be implemented after a capture chain
+        //For removing pieces
+        /*
+            if (abs(destTile.getX() - srcTile.getX()) > 1 && abs(destTile.getY() - srcTile.getY()) > 1){
+                Tuple dir = Tuple.getDirection(srcTile.getPosition(), destTile.getPosition());
+
+                Tile new_empty_tile = this.getTile(new Tuple(destTile.getX() + dir.x, destTile.getY() + dir.y));
+                new_empty_tile.setEmpty();
+            }
+         */
+
+
     }
 
     public void movePiece(Tuple srcCor, Tuple destCor){
