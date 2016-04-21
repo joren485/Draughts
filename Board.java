@@ -56,7 +56,7 @@ public class Board {
         return this.board[pos.x][pos.y];
     }
 
-    private List<Tile> getPossibleCaptures(Piece piece){
+    public List<Tile> getPossibleCaptures(Piece piece){
         List<Tile> captures = new ArrayList<>();
 
         Tuple[] moves;
@@ -139,13 +139,30 @@ public class Board {
             }
         }
 
+        ArrayList<Move> moves = new ArrayList<>();
+
         for(Tile dest: captures){
 
             Tuple src = piece.getPosition();
             this.movePiece(src, dest.getPosition());
 
-            node.addMove(getLegalMoves(piece, node));
+            moves.add(getLegalMoves(piece, node));
             this.movePiece(dest.getPosition(), src);
+        }
+
+        int maxium_height = 0;
+
+        for (Move m : moves){
+            int height = m.getHeight();
+            if (height > maxium_height){
+                maxium_height = height;
+            }
+        }
+
+        for (Move m : moves){
+            if(m.getHeight() == maxium_height){
+                node.addMove(m);
+            }
         }
 
         return node;
@@ -163,6 +180,7 @@ public class Board {
 
         Piece p = srcTile.getPiece();
         destTile.setPiece(p);
+        p.setPosition(destTile.getPosition());
         srcTile.setEmpty();
 
 

@@ -55,4 +55,8 @@ public class Piece {
         return this.position;
     }
 
+    public void setPosition(Tuple p){
+        this.position = p;
+    }
+
 }

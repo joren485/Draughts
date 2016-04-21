@@ -12,4 +12,8 @@ public class Tuple {
 
         return new Tuple((src.x - dest.x < 0) ? -1 : 1, (src.y - dest.y < 0) ? -1 : 1);
     }
+
+    public String toString(){
+        return "(" + this.x + "," + this.y + ")";
+    }
 } 
