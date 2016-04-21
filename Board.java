@@ -97,8 +97,19 @@ public class Board {
         return moves;
     }
 
-    //TODO Find the actual legal moves
-    //public List<List<Tuple>> getLegalMoves(){}
+    public Move getLegalMoves(Piece piece){
+        List<Tile> caputeres = getPossibleCaptures(piece);
+
+        // If no captures are possible, return a
+        if (caputeres.size() == 0){
+            Move end = new Move(piece.getPosition());
+            for(Tile t: getPossibleMoves(piece)){
+                end.addMove(new Move(t.getPosition()));
+            }
+            return end;
+        }
+
+    }
 
     /**
      * Move a piece to a location. It is assumed that the move is a valid one,
