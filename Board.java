@@ -45,7 +45,7 @@ public class Board {
         return this.board[pos.x][pos.y];
     }
 
-    public List<Tile> getPossibleCaptures(Piece piece){
+    private List<Tile> getPossibleCaptures(Piece piece){
         List<Tile> captures = new ArrayList<>();
         Tuple[] move_dirs = {new Tuple(1,1), new Tuple(-1,1), new Tuple(1,-1), new Tuple(-1,-1)};
 
@@ -57,8 +57,8 @@ public class Board {
             if (cor.x < this.board_size && cor.x >= 0 && cor.y < this.board_size && cor.y >= 0 &&
                     cor_behind.x < this.board_size && cor_behind.x >= 0 && cor_behind.y < this.board_size && cor_behind.y >= 0){
 
-                Tile t = this.board[cor.x][cor.y];
-                Tile t_behind = this.board[cor_behind.x][cor_behind.y];
+                Tile t = this.getTile(cor);
+                Tile t_behind = getTile(cor_behind);
 
                 if (t.getPiece().getColor() != piece.getColor() && t_behind.isEmpty()){
                     captures.add(t_behind);
@@ -68,7 +68,7 @@ public class Board {
             return captures;
     }
 
-    public List<Tile> getPossibleMoves(Piece piece){
+    private List<Tile> getPossibleMoves(Piece piece){
         List<Tile> moves = new ArrayList<>();
 
         Tuple[] move_dirs = new Tuple[2];
@@ -87,7 +87,7 @@ public class Board {
             Tuple cor = new Tuple(piece.getX() + move_dir.x, piece.getY() + move_dir.y);
 
             if (cor.x < this.board_size && cor.x >= 0 && cor.y < this.board_size && cor.y >= 0){
-                Tile t = this.board[cor.x][cor.y];
+                Tile t = getTile(cor);
 
                 if(t.isEmpty())
                     moves.add(t);
@@ -96,6 +96,9 @@ public class Board {
 
         return moves;
     }
+
+    //TODO Find the actual legal moves
+    //public List<List<Tuple>> getLegalMoves(){}
 
     /**
      * Move a piece to a location. It is assumed that the move is a valid one,
@@ -111,8 +114,6 @@ public class Board {
             Tuple dir = Tuple.getDirection(srcTile.getPosition(), destTile.getPosition());
 
             Tile new_empty_tile = this.getTile(new Tuple(destTile.getX() + dir.x, destTile.getY() + dir.y));
-
-            new_empty_tile.setEmpty();
         }
     }
 
@@ -131,7 +132,7 @@ public class Board {
                 temp = this.board[x][y];
 
                 if (temp.isEmpty()) {
-                    sb.append(" - ");
+                    sb.append(" * ");
                 }
 
                 else if (temp.getPiece().getColor() == Piece.PieceColor.White){
