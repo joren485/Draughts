@@ -11,27 +11,27 @@ public class Board {
     private final Tuple[] KINGMOVES;
 
     private final int board_size;
-    private final Tile[][] board;
+    private final Piece[][] board;
 
     public Board(int size){
         this.board_size = size;
-        this.board = new Tile[this.board_size][this.board_size];
+        this.board = new Piece[this.board_size][this.board_size];
 
         for (int y = 0; y < this.board_size; y++){
             for (int x = 0; x < this.board_size; x++){
 
                 if ((x + y) % 2 == 0) {
-                    this.board[x][y] = new Tile(Tile.TileColor.Beige, null, new Tuple(x,y));
+                    this.board[x][y] = null;
                 }
                 else{
                     if (y < (this.board_size/2) - 1){
-                        this.board[x][y] = new Tile(Tile.TileColor.Brown, new Piece(Piece.PieceColor.Black, new Tuple(x, y)), new Tuple(x,y));
+                        this.board[x][y] = new Piece(Piece.PieceColor.Black, new Tuple(x, y));
                     }
                     else if (y >= this.board_size - ((this.board_size/2) - 1)){
-                        this.board[x][y] = new Tile(Tile.TileColor.Brown, new Piece(Piece.PieceColor.White, new Tuple(x, y)), new Tuple(x,y));
+                        this.board[x][y] = new Piece(Piece.PieceColor.White, new Tuple(x, y));
                     }
                     else {
-                        this.board[x][y] = new Tile(Tile.TileColor.Brown, null, new Tuple(x,y));
+                        this.board[x][y] = null;
                     }
                 }
             }
@@ -52,12 +52,20 @@ public class Board {
         // Default size is 10
         this(10);
     }
-    public Tile getTile(Tuple pos){
+    public Piece getPiece(Tuple pos){
         return this.board[pos.x][pos.y];
     }
 
-    public List<Tile> getPossibleCaptures(Piece piece){
-        List<Tile> captures = new ArrayList<>();
+    public void setPiece(Piece p, Tuple cor){
+        this.board[cor.x][cor.y] = new Piece(p, cor);
+    }
+
+    public boolean isEmpty(Tuple cor){
+        return this.board[cor.x][cor.y] == null;
+    }
+
+    public List<Tuple> getPossibleCaptures(Piece piece){
+        List<Tuple> captures = new ArrayList<>();
 
         Tuple[] moves;
 
@@ -81,19 +89,16 @@ public class Board {
             if (cor.x < this.board_size && cor.x >= 0 && cor.y < this.board_size && cor.y >= 0 &&
                     cor_behind.x < this.board_size && cor_behind.x >= 0 && cor_behind.y < this.board_size && cor_behind.y >= 0){
 
-                Tile t = this.getTile(cor);
-                Tile t_behind = getTile(cor_behind);
-
-                if (t.getPiece().getColor() != piece.getColor() && t_behind.isEmpty()){
-                    captures.add(t_behind);
+                if (this.getPiece(cor).getColor() != piece.getColor() && this.isEmpty(cor_behind)){
+                    captures.add(cor_behind);
                 }
             }
         }
             return captures;
     }
 
-    private List<Tile> getPossibleMoves(Piece piece){
-        List<Tile> moves = new ArrayList<>();
+    private List<Tuple> getPossibleMoves(Piece piece){
+        List<Tuple> moves = new ArrayList<>();
 
         Tuple[] move_dirs;
         if (piece.isKing()){
@@ -118,10 +123,9 @@ public class Board {
             Tuple cor = new Tuple(piece.getX() + move_dir.x, piece.getY() + move_dir.y);
 
             if (cor.x < this.board_size && cor.x >= 0 && cor.y < this.board_size && cor.y >= 0){
-                Tile t = getTile(cor);
 
-                if(t.isEmpty())
-                    moves.add(t);
+                if(this.isEmpty(cor))
+                    moves.add(cor);
             }
         }
 
@@ -130,26 +134,27 @@ public class Board {
 
     public Move getLegalMoves(Piece piece, Move node){
 
-        List<Tile> captures = getPossibleCaptures(piece);
+        List<Tuple> captures = getPossibleCaptures(piece);
 
         if (captures.size() == 0){
-
-            for(Tile t: getPossibleMoves(piece)){
-                node.addMove(new Move(t.getPosition()));
+            for(Tuple cor: getPossibleMoves(piece)){
+                node.addMove(new Move(cor));
             }
         }
 
         ArrayList<Move> moves = new ArrayList<>();
 
-        for(Tile dest: captures){
-
+        for(Tuple dest: captures){
+            System.out.printf(dest.toString());
             Tuple src = piece.getPosition();
-            this.movePiece(src, dest.getPosition());
+            this.movePiece(src, dest);
 
-            moves.add(getLegalMoves(piece, node));
-            this.movePiece(dest.getPosition(), src);
+            //moves.add(getLegalMoves(piece, node));
+            node.addMove(getLegalMoves(piece, node));
+            this.movePiece(dest, src);
         }
 
+        /*
         int maxium_height = 0;
 
         for (Move m : moves){
@@ -164,7 +169,7 @@ public class Board {
                 node.addMove(m);
             }
         }
-
+        */
         return node;
     }
 
@@ -176,12 +181,11 @@ public class Board {
      * Move a piece to a location. It is assumed that the move is a valid one,
      * there are methods for all valid moves and captures.
      */
-    public void movePiece(Tile srcTile, Tile destTile){
+    public void movePiece(Tuple src, Tuple dest){
 
-        Piece p = srcTile.getPiece();
-        destTile.setPiece(p);
-        p.setPosition(destTile.getPosition());
-        srcTile.setEmpty();
+        Piece p = this.getPiece(src);
+        this.setPiece(p, dest);
+        this.board[src.x][src.y] = null;
 
 
         //TODO This code needs to be implemented after a capture chain
@@ -198,25 +202,21 @@ public class Board {
 
     }
 
-    public void movePiece(Tuple srcCor, Tuple destCor){
-        this.movePiece(this.getTile(srcCor), this.getTile(destCor));
-    }
-
     @Override
     public String toString(){
 
-        Tile temp;
+        Piece temp;
         StringBuilder sb = new StringBuilder();
 
         for (int y = 0; y < this.board_size; y++){
             for (int x = 0; x < this.board_size; x++){
                 temp = this.board[x][y];
 
-                if (temp.isEmpty()) {
+                if (temp == null) {
                     sb.append(" * ");
                 }
 
-                else if (temp.getPiece().getColor() == Piece.PieceColor.White){
+                else if (temp.getColor() == Piece.PieceColor.White){
                     sb.append(" W ");
                 }
                 else {
