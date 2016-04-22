@@ -31,10 +31,10 @@ public class Board {
                 }
                 else{
                     if (y < (this.board_size/2) - 1){
-                        this.board[x][y] = new Piece(Piece.PieceColor.Black, new Tuple(x, y));
+                        this.board[x][y] = new Piece(Piece.PieceColor.Black);
                     }
                     else if (y >= this.board_size - ((this.board_size/2) - 1)){
-                        this.board[x][y] = new Piece(Piece.PieceColor.White, new Tuple(x, y));
+                        this.board[x][y] = new Piece(Piece.PieceColor.White);
                     }
                     else {
                         this.board[x][y] = null;
@@ -54,14 +54,13 @@ public class Board {
     }
 
     public void setPiece(Piece p, Tuple cor){
-        this.board[cor.x][cor.y] = new Piece(p, cor);
+        this.board[cor.x][cor.y] = new Piece(p);
     }
 
     public boolean isEmpty(Tuple cor){
         return this.board[cor.x][cor.y] == null;
     }
-
-
+    
     public boolean getPosOnBoard(Tuple position) {
         return position.x < this.board_size && position.y < this.board_size && position.x >= 0 && position.y >= 0;
     }
@@ -210,7 +209,6 @@ public class Board {
                 capture_position = Tuple.add(capture_position, move_direction);
             }
 
-
             if(this.getPosOnBoard(capture_position)) {
 
                 Piece capture_piece = this.getPiece(capture_position);
@@ -226,9 +224,7 @@ public class Board {
                     }
                 }
             }
-
         }
-
         return possibleCaptures;
     }
 
@@ -238,7 +234,7 @@ public class Board {
 
         List<Move> moves = new LinkedList<>();
 
-        int maxium_height = 0;
+        int max_height = 0;
 
         for (Tuple dest : captures){
             this.movePiece(src, dest);
@@ -250,13 +246,13 @@ public class Board {
             this.movePiece(dest, src);
 
             int height = branch.getHeight();
-            if (height > maxium_height) {
-                maxium_height = height;
+            if (height > max_height) {
+                max_height = height;
             }
         }
 
         for (Move m : moves) {
-            if(m.getHeight() == maxium_height) {
+            if(m.getHeight() == max_height) {
                 node.addMove(m);
             }
         }

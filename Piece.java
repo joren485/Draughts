@@ -9,51 +9,37 @@ public class Piece {
     }
 
     private boolean captured = false;
-    private boolean King = false;
+    private boolean king = false;
 
     private final PieceColor color;
-    private Tuple position;
 
-    public Piece(PieceColor color, Tuple pos, boolean King){
+    public Piece(PieceColor color, boolean king){
         this.color = color;
-        this.King = King;
-        this.position = pos;
+        this.king = king;
     }
 
-    public Piece(PieceColor color, Tuple pos){
-        this(color, pos, false);
+    public Piece(PieceColor color){
+        this(color, false);
     }
 
     /**
      * Copies a piece p.
      * @param p the piece to be copied.
      */
-    public Piece(Piece p, Tuple pos){
-        this(p.getColor(), pos, p.isKing());
+    public Piece(Piece p){
+        this(p.getColor(), p.isKing());
     }
 
     public boolean isKing(){
-        return this.King;
+        return this.king;
     }
 
     public void crown(){
-        this.King = true;
+        this.king = true;
     }
 
     public PieceColor getColor(){
         return this.color;
-    }
-
-    public int getX(){
-        return this.position.x;
-    }
-
-    public int getY(){
-        return this.position.y;
-    }
-
-    public Tuple getPosition(){
-        return this.position;
     }
 
     public void setCaptured(boolean captured){
