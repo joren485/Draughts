@@ -1,5 +1,3 @@
-import java.util.List;
-
 /**
  * Created by Joren on 20-Apr-16.
  */
@@ -17,8 +15,6 @@ public class Main {
 
         System.out.println(b);
 
-        Move root = b.getLegalMoves(b.getPiece(new Tuple(1, 4)));
-
-
+        Move root = b.getPossibleMoves(new Tuple(1, 4));
     }
 }
