@@ -12,9 +12,9 @@ import android.widget.BaseAdapter;
 public class CheckerBoardAdapter extends BaseAdapter{
     private final Context context;
     private final int columnAmount;
-    private final Tile[][] tiles;
+    private final TileView[][] tiles;
 
-    public CheckerBoardAdapter(Context c, Tile[][] tiles) {
+    public CheckerBoardAdapter(Context c, TileView[][] tiles) {
         context = c;
         this.tiles = tiles;
         this.columnAmount = tiles.length;
@@ -37,12 +37,12 @@ public class CheckerBoardAdapter extends BaseAdapter{
 
     @Override
     public View getView(int position, View convertView, ViewGroup viewGroup) {
-        Tile mView;
+        TileView mView;
         if (convertView == null) {
             mView = tiles[position / columnAmount][position % columnAmount];
 
         } else {
-            mView = (Tile) convertView;
+            mView = (TileView) convertView;
         }
 
         return mView;
