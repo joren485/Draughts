@@ -15,8 +15,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int BROWN = R.drawable.brown;
     private static final int BEIGE = R.drawable.beige;
 
-    private final int columnAmount = 10;
-    private final int rowsWithPiecesAmount = 3;
+    private final int columnAmount = 8;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initPieces() {
+        int rowsWithPiecesAmount = (columnAmount - 2) / 2;
         for (int i = 0; i < rowsWithPiecesAmount; i++) {
             for (int j = i % 2; j < columnAmount; j += 2) {
                 tiles[i][columnAmount - j - 1].setOccupation(TileView.Occupation.BLACK);
