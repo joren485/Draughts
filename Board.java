@@ -2,8 +2,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import static java.lang.Math.abs;
-
 /**
  * Created by Joren on 20-Apr-16.
  */
@@ -79,17 +77,23 @@ public class Board {
         this.setPiece(p, dest);
         this.board[src.x][src.y] = null;
 
-        //For removing pieces
+        Tuple move_direction = Tuple.getDirection(src, dest);
+        Tuple possible_piece = Tuple.add(src, move_direction);
 
-            if (abs(dest.x - src.x) > 1 && abs(dest.y - src.y) > 1){
-                Tuple dir = Tuple.getDirection(src, dest);
+        while (this.getPosOnBoard(possible_piece) && this.isEmpty(possible_piece)){
+            possible_piece = Tuple.add(src, move_direction);
+        }
 
-                Tuple new_empty_cor = new Tuple(dest.x + dir.x, dest.y + dir.y);
-                this.getPiece(new_empty_cor).switchinChain();
+        if (this.getPosOnBoard(possible_piece) && !this.isEmpty(possible_piece)){
+            Piece capture_piece = this.getPiece(possible_piece);
+
+            if (capture_piece.getColor() != p.getColor()){
+                capture_piece.switchCaptured();
             }
+        }
     }
 
-    public List<Tuple> getAllMoves(Tuple from) {
+    private List<Tuple> getAllMoves(Tuple from) {
 
         if(this.isEmpty(from)) {
             return new LinkedList<>();
@@ -107,7 +111,7 @@ public class Board {
         }
     }
 
-    public List<Tuple> getAllMovesMan(Tuple from, Piece.PieceColor color){
+    private List<Tuple> getAllMovesMan(Tuple from, Piece.PieceColor color){
 
         Tuple[] move_directions = (color == Piece.PieceColor.White) ? WHITE_PAWN_MOVES : BLACK_PAWN_MOVES;
 
@@ -122,7 +126,6 @@ public class Board {
 
         return moves;
     }
-
 
     /**
      * Finds all the places a King can move without capturing another piece.
@@ -150,7 +153,7 @@ public class Board {
      * @param from the position of the piece to move from.
      * @return A list containing all moves towards all position positions from here.
      */
-    public List<Tuple> getAllCaptures(Tuple from){
+    private List<Tuple> getAllCaptures(Tuple from){
 
         if(this.isEmpty(from)) {
             return new ArrayList<>();
@@ -167,7 +170,7 @@ public class Board {
         }
     }
 
-    public List<Tuple> getAllCapturesMan(Tuple from, Piece.PieceColor color){
+    private List<Tuple> getAllCapturesMan(Tuple from, Piece.PieceColor color){
 
         List<Tuple> moves = new LinkedList<>();
 
@@ -181,9 +184,8 @@ public class Board {
 
                 if(this.getPosOnBoard(dest_position)
                         && this.isEmpty(dest_position)
-                        && capture_piece != null
                         && capture_piece.getColor() != color
-                        && !capture_piece.getinChain()){
+                        && !capture_piece.isCaptured()){
 
                     moves.add(dest_position);
                 }
@@ -197,7 +199,7 @@ public class Board {
      * @param from the position of the piece to move from.
      * @return A list containing all moves towards all position positions from here.
      */
-    public List<Tuple> getAllCapturesKing(Tuple from, Piece.PieceColor color) {
+    private List<Tuple> getAllCapturesKing(Tuple from, Piece.PieceColor color) {
 
         List<Tuple> possibleCaptures = new ArrayList<>();
 
@@ -216,7 +218,7 @@ public class Board {
                 Piece capture_piece = this.getPiece(capture_position);
 
                 if (capture_piece.getColor() != color
-                        && !capture_piece.getinChain()){
+                        && !capture_piece.isCaptured()){
 
                     Tuple dest_position = Tuple.add(capture_position, move_direction);
 
@@ -232,7 +234,7 @@ public class Board {
         return possibleCaptures;
     }
 
-    public void getCaptureChain(Tuple src, Move node){
+    private void getCaptureChain(Tuple src, Move node){
 
         List<Tuple> captures = getAllCaptures(src);
 

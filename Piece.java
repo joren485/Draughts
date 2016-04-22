@@ -8,7 +8,7 @@ public class Piece {
         White;
     }
 
-    private boolean inChain = false;
+    private boolean captured = false;
     private boolean King = false;
 
     private final PieceColor color;
@@ -56,16 +56,16 @@ public class Piece {
         return this.position;
     }
 
-    public void setinChain(boolean inChain){
-        this.inChain = inChain;
+    public void setCaptured(boolean captured){
+        this.captured = captured;
     }
 
-    public void switchinChain(){
-        this.inChain = !this.inChain;
+    public void switchCaptured(){
+        this.captured = !this.captured;
     }
 
-    public boolean getinChain(){
-        return this.inChain;
+    public boolean isCaptured(){
+        return this.captured;
     }
 
 }
