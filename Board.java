@@ -60,7 +60,7 @@ public class Board {
     public boolean isEmpty(Tuple cor){
         return this.board[cor.x][cor.y] == null;
     }
-    
+
     public boolean getPosOnBoard(Tuple position) {
         return position.x < this.board_size && position.y < this.board_size && position.x >= 0 && position.y >= 0;
     }
