@@ -71,8 +71,6 @@ public class Board {
      * there are methods for all valid moves and captures.
      */
     public void movePiece(Tuple src, Tuple dest){
-
-        System.out.println(src + " to" + dest + "\n");
         Piece p = this.getPiece(src);
         this.setPiece(p, dest);
         this.board[src.x][src.y] = null;
@@ -240,26 +238,18 @@ public class Board {
 
         List<Move> moves = new LinkedList<>();
 
+        int maxium_height = 0;
+
         for (Tuple dest : captures){
-
-            System.out.println(dest.toString());
-
-            System.out.println(src);
-
             this.movePiece(src, dest);
-            this.getPiece(dest);
 
             Move branch = new Move(dest);
             getCaptureChain(dest, branch);
 
             moves.add(branch);
             this.movePiece(dest, src);
-        }
 
-        int maxium_height = 0;
-
-        for (Move m : moves) {
-            int height = m.getHeight();
+            int height = branch.getHeight();
             if (height > maxium_height) {
                 maxium_height = height;
             }
