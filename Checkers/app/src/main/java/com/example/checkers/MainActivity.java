@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    Tile[][] tiles;
+    TileView[][] tiles;
     private static final int BROWN = R.drawable.brown;
     private static final int BEIGE = R.drawable.beige;
 
@@ -44,15 +44,16 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 tvPosition.setText("Position: (" + (position/columnAmount + 1) + "," + (position%columnAmount + 1) + ")");
                 tvPosition.setVisibility(View.VISIBLE);
+                select(position / columnAmount, position % columnAmount);
             }
         });
     }
 
     private void initTiles() {
-        tiles = new Tile[columnAmount][columnAmount];
+        tiles = new TileView[columnAmount][columnAmount];
         for (int i = 0; i < columnAmount; i++) {
             for (int j = 0; j < columnAmount; j++) {
-                Tile tile = new Tile(this, (i + j) % 2 == 0 ? BEIGE : BROWN);
+                TileView tile = new TileView(this, (i + j) % 2 == 0 ? BEIGE : BROWN);
                 tiles[i][j] = tile;
             }
         }
@@ -61,9 +62,13 @@ public class MainActivity extends AppCompatActivity {
     private void initPieces() {
         for (int i = 0; i < rowsWithPiecesAmount; i++) {
             for (int j = i % 2; j < columnAmount; j += 2) {
-                tiles[i][columnAmount - j - 1].setOccupation(Tile.Occupation.BLACK);
-                tiles[columnAmount - i - 1][j].setOccupation(Tile.Occupation.WHITE);
+                tiles[i][columnAmount - j - 1].setOccupation(TileView.Occupation.BLACK);
+                tiles[columnAmount - i - 1][j].setOccupation(TileView.Occupation.WHITE);
             }
         }
+    }
+
+    private void select(int x, int y) {
+        tiles[x][y].select(!tiles[x][y].selected());
     }
 }
