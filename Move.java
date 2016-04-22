@@ -9,7 +9,6 @@ public class Move {
     private final Tuple srcCor;
     private final List<Move> nextMoves = new LinkedList<>();
 
-
     public Move(Tuple src){
         this.srcCor = src;
     }

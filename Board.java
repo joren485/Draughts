@@ -64,6 +64,29 @@ public class Board {
         return this.board[cor.x][cor.y] == null;
     }
 
+    /**
+     * Move a piece to a location. It is assumed that the move is a valid one,
+     * there are methods for all valid moves and captures.
+     */
+    public void movePiece(Tuple src, Tuple dest){
+
+        System.out.println(src + " to" + dest + "\n");
+        Piece p = this.getPiece(src);
+        this.setPiece(p, dest);
+        this.board[src.x][src.y] = null;
+
+
+        //TODO This code needs to be implemented after a capture chain
+        //For removing pieces
+
+            if (abs(dest.x - src.x) > 1 && abs(dest.y - src.y) > 1){
+                Tuple dir = Tuple.getDirection(src, dest);
+
+                Tuple new_empty_cor = new Tuple(dest.x + dir.x, dest.y + dir.y);
+                this.getPiece(new_empty_cor).switchinChain();
+            }
+    }
+
     public List<Tuple> getPossibleCaptures(Piece piece){
         List<Tuple> captures = new ArrayList<>();
 
@@ -87,11 +110,13 @@ public class Board {
             Tuple cor_behind = new Tuple(piece.getX() + 2* move_dir.x, piece.getY() + 2* move_dir.y);
 
             if (cor.x < this.board_size && cor.x >= 0 && cor.y < this.board_size && cor.y >= 0 &&
-                    cor_behind.x < this.board_size && cor_behind.x >= 0 && cor_behind.y < this.board_size && cor_behind.y >= 0){
+                    cor_behind.x < this.board_size && cor_behind.x >= 0 && cor_behind.y < this.board_size && cor_behind.y >= 0
+                    && !this.isEmpty(cor)
+                    && !this.getPiece(cor).getinChain()
+                    && this.getPiece(cor).getColor() != piece.getColor()
+                    && this.isEmpty(cor_behind)){
 
-                if (this.getPiece(cor).getColor() != piece.getColor() && this.isEmpty(cor_behind)){
-                    captures.add(cor_behind);
-                }
+                captures.add(cor_behind);
             }
         }
             return captures;
@@ -117,7 +142,6 @@ public class Board {
             }
         }
 
-
         for (Tuple move_dir: move_dirs){
 
             Tuple cor = new Tuple(piece.getX() + move_dir.x, piece.getY() + move_dir.y);
@@ -132,74 +156,61 @@ public class Board {
         return moves;
     }
 
-    public Move getLegalMoves(Piece piece, Move node){
+    public void getLegalCaptures(Tuple src, Move node){
+
+        Piece piece = this.getPiece(src);
 
         List<Tuple> captures = getPossibleCaptures(piece);
 
-        if (captures.size() == 0){
-            for(Tuple cor: getPossibleMoves(piece)){
-                node.addMove(new Move(cor));
-            }
-        }
-
         ArrayList<Move> moves = new ArrayList<>();
 
-        for(Tuple dest: captures){
-            System.out.printf(dest.toString());
-            Tuple src = piece.getPosition();
-            this.movePiece(src, dest);
 
-            //moves.add(getLegalMoves(piece, node));
-            node.addMove(getLegalMoves(piece, node));
+        for (Tuple dest : captures){
+
+            System.out.println(dest.toString());
+
+            System.out.println(src);
+
+            this.movePiece(src, dest);
+            this.getPiece(dest);
+
+            Move branch = new Move(dest);
+            getLegalCaptures(dest, branch);
+
+            moves.add(branch);
             this.movePiece(dest, src);
         }
 
-        /*
         int maxium_height = 0;
 
-        for (Move m : moves){
+        for (Move m : moves) {
             int height = m.getHeight();
-            if (height > maxium_height){
+            if (height > maxium_height) {
                 maxium_height = height;
             }
         }
 
-        for (Move m : moves){
-            if(m.getHeight() == maxium_height){
+        for (Move m : moves) {
+            if(m.getHeight() == maxium_height) {
                 node.addMove(m);
             }
         }
-        */
-        return node;
     }
 
     public Move getLegalMoves(Piece piece){
-        return getLegalMoves(piece, new Move(piece.getPosition()));
-    }
 
-    /**
-     * Move a piece to a location. It is assumed that the move is a valid one,
-     * there are methods for all valid moves and captures.
-     */
-    public void movePiece(Tuple src, Tuple dest){
+        List<Tuple> captures = getPossibleCaptures(piece);
+        Move root = new Move(piece.getPosition());
 
-        Piece p = this.getPiece(src);
-        this.setPiece(p, dest);
-        this.board[src.x][src.y] = null;
-
-
-        //TODO This code needs to be implemented after a capture chain
-        //For removing pieces
-        /*
-            if (abs(destTile.getX() - srcTile.getX()) > 1 && abs(destTile.getY() - srcTile.getY()) > 1){
-                Tuple dir = Tuple.getDirection(srcTile.getPosition(), destTile.getPosition());
-
-                Tile new_empty_tile = this.getTile(new Tuple(destTile.getX() + dir.x, destTile.getY() + dir.y));
-                new_empty_tile.setEmpty();
+        if (captures.size() == 0){
+            for(Tuple cor: getPossibleMoves(piece)){
+                root.addMove(new Move(cor));
             }
-         */
+            return root;
+        }
 
-
+        getLegalCaptures(piece.getPosition(), root);
+        return root;
     }
 
     @Override

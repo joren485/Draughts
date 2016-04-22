@@ -8,9 +8,10 @@ public class Piece {
         White;
     }
 
+    private boolean inChain = false;
     private boolean King = false;
-    private final PieceColor color;
 
+    private final PieceColor color;
     private Tuple position;
 
     public Piece(PieceColor color, Tuple pos, boolean King){
@@ -55,8 +56,16 @@ public class Piece {
         return this.position;
     }
 
-    public void setPosition(Tuple p){
-        this.position = p;
+    public void setinChain(boolean inChain){
+        this.inChain = inChain;
+    }
+
+    public void switchinChain(){
+        this.inChain = !this.inChain;
+    }
+
+    public boolean getinChain(){
+        return this.inChain;
     }
 
 }
