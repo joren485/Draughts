@@ -232,29 +232,14 @@ public class Board {
 
         List<Tuple> captures = getAllCaptures(src);
 
-        List<Move> moves = new LinkedList<>();
-
-        int max_height = 0;
-
         for (Tuple dest : captures){
             this.movePiece(src, dest);
 
             Move branch = new Move(dest);
             getCaptureChain(dest, branch);
 
-            moves.add(branch);
+            node.addMove(branch);
             this.movePiece(dest, src);
-
-            int height = branch.getHeight();
-            if (height > max_height) {
-                max_height = height;
-            }
-        }
-
-        for (Move m : moves) {
-            if(m.getHeight() == max_height) {
-                node.addMove(m);
-            }
         }
     }
 
