@@ -1,1 +1,1 @@
-R&D Project door Joren, Roland, Gijs en Marco.
+Draughts app by Joren, Roland, Marco and Gijs.
