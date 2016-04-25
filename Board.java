@@ -1,14 +1,20 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-
-import static java.lang.Math.abs;
 
 /**
  * Created by Joren on 20-Apr-16.
  */
 public class Board {
 
-    private final Tuple[] KINGMOVES;
+    private static final Tuple[] WHITE_PAWN_MOVES
+            = {new Tuple(1,-1), new Tuple(-1,-1)};
+    private static final Tuple[] BLACK_PAWN_MOVES
+            = {new Tuple(1,1), new Tuple(-1,1)};
+    private static final Tuple[] CAPTURE_MOVES
+            = {new Tuple(1,1), new Tuple(1,-1), new Tuple(-1,1), new Tuple(-1,-1)};
+    private static final Tuple[] KING_DIRECTIONS = CAPTURE_MOVES;
+
 
     private final int board_size;
     private final Piece[][] board;
@@ -25,10 +31,10 @@ public class Board {
                 }
                 else{
                     if (y < (this.board_size/2) - 1){
-                        this.board[x][y] = new Piece(Piece.PieceColor.Black, new Tuple(x, y));
+                        this.board[x][y] = new Piece(Piece.PieceColor.Black);
                     }
                     else if (y >= this.board_size - ((this.board_size/2) - 1)){
-                        this.board[x][y] = new Piece(Piece.PieceColor.White, new Tuple(x, y));
+                        this.board[x][y] = new Piece(Piece.PieceColor.White);
                     }
                     else {
                         this.board[x][y] = null;
@@ -36,15 +42,6 @@ public class Board {
                 }
             }
         }
-
-        this.KINGMOVES = new Tuple[this.board_size * this.board_size];
-        int index = 0;
-        for(int x = -1*(this.board_size - 1); x < this.board_size; x++){
-            for(int y = -1*(this.board_size - 1); y < this.board_size; y++){
-                this.KINGMOVES[index] = new Tuple(x, y);
-            }
-        }
-
     }
 
     public Board(){
@@ -57,11 +54,15 @@ public class Board {
     }
 
     public void setPiece(Piece p, Tuple cor){
-        this.board[cor.x][cor.y] = new Piece(p, cor);
+        this.board[cor.x][cor.y] = new Piece(p);
     }
 
     public boolean isEmpty(Tuple cor){
         return this.board[cor.x][cor.y] == null;
+    }
+
+    public boolean getPosOnBoard(Tuple position) {
+        return position.x < this.board_size && position.y < this.board_size && position.x >= 0 && position.y >= 0;
     }
 
     /**
@@ -69,147 +70,193 @@ public class Board {
      * there are methods for all valid moves and captures.
      */
     public void movePiece(Tuple src, Tuple dest){
-
-        System.out.println(src + " to" + dest + "\n");
         Piece p = this.getPiece(src);
         this.setPiece(p, dest);
         this.board[src.x][src.y] = null;
 
+        Tuple move_direction = Tuple.getDirection(src, dest);
+        Tuple possible_piece = Tuple.add(src, move_direction);
 
-        //TODO This code needs to be implemented after a capture chain
-        //For removing pieces
+        while (this.getPosOnBoard(possible_piece) && this.isEmpty(possible_piece)){
+            possible_piece = Tuple.add(src, move_direction);
+        }
 
-            if (abs(dest.x - src.x) > 1 && abs(dest.y - src.y) > 1){
-                Tuple dir = Tuple.getDirection(src, dest);
+        if (this.getPosOnBoard(possible_piece) && !this.isEmpty(possible_piece)){
+            Piece capture_piece = this.getPiece(possible_piece);
 
-                Tuple new_empty_cor = new Tuple(dest.x + dir.x, dest.y + dir.y);
-                this.getPiece(new_empty_cor).switchinChain();
+            if (capture_piece.getColor() != p.getColor()){
+                capture_piece.switchCaptured();
             }
+        }
     }
 
-    public List<Tuple> getPossibleCaptures(Piece piece){
-        List<Tuple> captures = new ArrayList<>();
+    private List<Tuple> getAllMoves(Tuple from) {
 
-        Tuple[] moves;
+        if(this.isEmpty(from)) {
+            return new LinkedList<>();
+        }
 
-        if (piece.isKing()){
-            moves = this.KINGMOVES;
+        Piece piece = this.getPiece(from);
+
+        if(piece.isKing()) {
+            return this.getAllMovesKing(from);
         }
 
         else{
-            moves = new Tuple[4];
-            moves[0] = new Tuple(1,1);
-            moves[1] = new Tuple(-1,1);
-            moves[2] = new Tuple(1,-1);
-            moves[3] = new Tuple(-1,-1);
+
+            return this.getAllMovesMan(from, piece.getColor());
         }
-
-        for (Tuple move_dir: moves) {
-
-            Tuple cor = new Tuple(piece.getX() + move_dir.x, piece.getY() + move_dir.y);
-            Tuple cor_behind = new Tuple(piece.getX() + 2* move_dir.x, piece.getY() + 2* move_dir.y);
-
-            if (cor.x < this.board_size && cor.x >= 0 && cor.y < this.board_size && cor.y >= 0 &&
-                    cor_behind.x < this.board_size && cor_behind.x >= 0 && cor_behind.y < this.board_size && cor_behind.y >= 0
-                    && !this.isEmpty(cor)
-                    && !this.getPiece(cor).getinChain()
-                    && this.getPiece(cor).getColor() != piece.getColor()
-                    && this.isEmpty(cor_behind)){
-
-                captures.add(cor_behind);
-            }
-        }
-            return captures;
     }
 
-    private List<Tuple> getPossibleMoves(Piece piece){
-        List<Tuple> moves = new ArrayList<>();
+    private List<Tuple> getAllMovesMan(Tuple from, Piece.PieceColor color){
 
-        Tuple[] move_dirs;
-        if (piece.isKing()){
-            move_dirs = this.KINGMOVES;
-        }
-        else{
-            move_dirs = new Tuple[2];
-            if (piece.getColor() == Piece.PieceColor.Black){
-                move_dirs[0] = new Tuple(1,1);
-                move_dirs[1] = new Tuple(-1,1);
-            }
+        Tuple[] move_directions = (color == Piece.PieceColor.White) ? WHITE_PAWN_MOVES : BLACK_PAWN_MOVES;
 
-            else{
-                move_dirs[0] = new Tuple(1,-1);
-                move_dirs[1] = new Tuple(-1,-1);
-            }
-        }
+        List<Tuple> moves = new LinkedList<>();
 
-        for (Tuple move_dir: move_dirs){
-
-            Tuple cor = new Tuple(piece.getX() + move_dir.x, piece.getY() + move_dir.y);
-
-            if (cor.x < this.board_size && cor.x >= 0 && cor.y < this.board_size && cor.y >= 0){
-
-                if(this.isEmpty(cor))
-                    moves.add(cor);
+        for(Tuple move_direction : move_directions) {
+            final Tuple dest = Tuple.add(from, move_direction);
+            if(this.getPosOnBoard(dest) && this.isEmpty(dest)) {
+                moves.add(dest);
             }
         }
 
         return moves;
     }
 
-    public void getLegalCaptures(Tuple src, Move node){
+    /**
+     * Finds all the places a King can move without capturing another piece.
+     * Has been bug tested.
+     * @param from the position of the piece to move from.
+     * @return A list containing all moves towards all position positions from here.
+     */
+    private List<Tuple> getAllMovesKing(Tuple from) {
+        List<Tuple> moves = new LinkedList<>();
 
-        Piece piece = this.getPiece(src);
+        for(Tuple direction : KING_DIRECTIONS) {
+            Tuple dest = Tuple.add(from, direction);
 
-        List<Tuple> captures = getPossibleCaptures(piece);
-
-        ArrayList<Move> moves = new ArrayList<>();
-
-
-        for (Tuple dest : captures){
-
-            System.out.println(dest.toString());
-
-            System.out.println(src);
-
-            this.movePiece(src, dest);
-            this.getPiece(dest);
-
-            Move branch = new Move(dest);
-            getLegalCaptures(dest, branch);
-
-            moves.add(branch);
-            this.movePiece(dest, src);
-        }
-
-        int maxium_height = 0;
-
-        for (Move m : moves) {
-            int height = m.getHeight();
-            if (height > maxium_height) {
-                maxium_height = height;
+            while(this.getPosOnBoard(dest) && this.isEmpty(dest)) {
+                moves.add(dest);
+                dest = Tuple.add(dest, direction);
             }
         }
 
-        for (Move m : moves) {
-            if(m.getHeight() == maxium_height) {
-                node.addMove(m);
-            }
+        return moves;
+    }
+
+    /**
+     * Finds all the places a piece can move to while capturing another piece.
+     * @param from the position of the piece to move from.
+     * @return A list containing all moves towards all position positions from here.
+     */
+    private List<Tuple> getAllCaptures(Tuple from){
+
+        if(this.isEmpty(from)) {
+            return new ArrayList<>();
+        }
+
+        Piece piece = this.getPiece(from);
+
+        if(piece.isKing()) {
+            return getAllCapturesKing(from, piece.getColor());
+        }
+
+        else{
+            return getAllCapturesMan(from, piece.getColor());
         }
     }
 
-    public Move getLegalMoves(Piece piece){
+    private List<Tuple> getAllCapturesMan(Tuple from, Piece.PieceColor color){
 
-        List<Tuple> captures = getPossibleCaptures(piece);
-        Move root = new Move(piece.getPosition());
+        List<Tuple> moves = new LinkedList<>();
+
+        for(Tuple move_direction : CAPTURE_MOVES) {
+            Tuple capture_position = Tuple.add(from, move_direction);
+
+            if(this.getPosOnBoard(capture_position)){
+
+                Piece capture_piece = this.getPiece(capture_position);
+                Tuple dest_position = Tuple.add(capture_position, move_direction);
+
+                if(this.getPosOnBoard(dest_position)
+                        && this.isEmpty(dest_position)
+                        && capture_piece.getColor() != color
+                        && !capture_piece.isCaptured()){
+
+                    moves.add(dest_position);
+                }
+            }
+        }
+        return moves;
+    }
+
+    /**
+     * Finds all the places a King can move to while capturing another piece.
+     * @param from the position of the piece to move from.
+     * @return A list containing all moves towards all position positions from here.
+     */
+    private List<Tuple> getAllCapturesKing(Tuple from, Piece.PieceColor color) {
+
+        List<Tuple> possibleCaptures = new ArrayList<>();
+
+        for (Tuple move_direction : KING_DIRECTIONS) {
+            Tuple capture_position = Tuple.add(from, move_direction);
+
+            while(this.getPosOnBoard(capture_position)
+                    && this.isEmpty(capture_position)) {
+
+                capture_position = Tuple.add(capture_position, move_direction);
+            }
+
+            if(this.getPosOnBoard(capture_position)) {
+
+                Piece capture_piece = this.getPiece(capture_position);
+
+                if (capture_piece.getColor() != color
+                        && !capture_piece.isCaptured()){
+
+                    Tuple dest_position = Tuple.add(capture_position, move_direction);
+
+                    while(this.getPosOnBoard(dest_position) && this.isEmpty(dest_position)) {
+                        possibleCaptures.add(dest_position);
+                        dest_position = Tuple.add(dest_position, move_direction);
+                    }
+                }
+            }
+        }
+        return possibleCaptures;
+    }
+
+    private void getCaptureChain(Tuple src, Move node){
+
+        List<Tuple> captures = getAllCaptures(src);
+
+        for (Tuple dest : captures){
+            this.movePiece(src, dest);
+
+            Move branch = new Move(dest);
+            getCaptureChain(dest, branch);
+
+            node.addMove(branch);
+            this.movePiece(dest, src);
+        }
+    }
+
+    public Move getPossibleMoves(Tuple src){
+
+        List<Tuple> captures = getAllCaptures(src);
+        Move root = new Move(src);
 
         if (captures.size() == 0){
-            for(Tuple cor: getPossibleMoves(piece)){
-                root.addMove(new Move(cor));
+            for(Tuple position: getAllMoves(src)){
+                root.addMove(new Move(position));
             }
             return root;
         }
 
-        getLegalCaptures(piece.getPosition(), root);
+        getCaptureChain(src, root);
+
         return root;
     }
 

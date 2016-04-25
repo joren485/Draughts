@@ -25,8 +25,8 @@ public class TileView extends ImageView {
         setPadding(5, 5, 5, 5);
         selected = false;
         setBackgroundResource(background);
-        center.setColor(0x400000ff);
-        border.setColor(0xff0000ff);
+        center.setColor(getResources().getColor(R.color.centerSelected));
+        border.setColor(getResources().getColor(R.color.borderSelected));
         border.setStrokeWidth(3);
         System.out.println(GameSettings.getInstance().getBoardSize());
     }
