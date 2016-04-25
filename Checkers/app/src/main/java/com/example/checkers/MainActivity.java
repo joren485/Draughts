@@ -1,74 +1,64 @@
 package com.example.checkers;
 
-import android.os.Bundle;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.GridView;
-import android.widget.TextView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Spinner;
 
 public class MainActivity extends AppCompatActivity {
-
-    TileView[][] tiles;
-    private static final int BROWN = R.drawable.brown;
-    private static final int BEIGE = R.drawable.beige;
-
-    private final int columnAmount = 10;
-    private final int rowsWithPiecesAmount = 3;
+    Spinner spSelectSize;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // remove title
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
         setContentView(R.layout.activity_main);
 
 
-        initTiles();
-        initPieces();
 
-        GridView gvChessBoard = (GridView) findViewById(R.id.gvChessBoard);
-        CheckerBoardAdapter gaSquares = new CheckerBoardAdapter(this, tiles);
+        spSelectSize = (Spinner) findViewById(R.id.spSelectSize);
+        final ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource
+                (this, R.array.board_sizes, R.layout.board_size_text);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        final Button btStartGame = (Button) findViewById(R.id.btStartGame);
 
-        gvChessBoard.setNumColumns(columnAmount);
-        gvChessBoard.setAdapter(gaSquares);
-        final TextView tvPosition = (TextView) findViewById(R.id.tvPosition);
+        /**
+         * The default board size is 10 (which is on the 1st place in the values array.
+         */
+        spSelectSize.setSelection(1);
 
-        gvChessBoard.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                tvPosition.setText("Position: (" + (position/columnAmount + 1) + "," + (position%columnAmount + 1) + ")");
-                tvPosition.setVisibility(View.VISIBLE);
-                select(position / columnAmount, position % columnAmount);
-            }
-        });
-    }
+        if (spSelectSize != null) {
+            spSelectSize.setAdapter(adapter);
 
-    private void initTiles() {
-        tiles = new TileView[columnAmount][columnAmount];
-        for (int i = 0; i < columnAmount; i++) {
-            for (int j = 0; j < columnAmount; j++) {
-                TileView tile = new TileView(this, (i + j) % 2 == 0 ? BEIGE : BROWN);
-                tiles[i][j] = tile;
+            if (btStartGame != null) {
+                btStartGame.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int index = spSelectSize.getSelectedItemPosition();
+                        if (index != Spinner.INVALID_POSITION) {
+                            /**
+                             * Determine which board size the user has selected. Save in in GameSettings
+                             */
+                            int boardSize = getResources().getIntArray(R.array.board_sizes_nrs)[index];
+                            GameSettings.getInstance().setBoardSize(boardSize);
+                            /**
+                             * Start a game of checkers with these settings.
+                             */
+                            Intent checkersIntent = new Intent(v.getContext(), CheckersActivity.class);
+                            startActivity(checkersIntent);
+                        }
+                    }
+                });
             }
         }
     }
 
-    private void initPieces() {
-        for (int i = 0; i < rowsWithPiecesAmount; i++) {
-            for (int j = i % 2; j < columnAmount; j += 2) {
-                tiles[i][columnAmount - j - 1].setOccupation(TileView.Occupation.BLACK);
-                tiles[columnAmount - i - 1][j].setOccupation(TileView.Occupation.WHITE);
-            }
-        }
+    @Override
+    public void onResume(){
+        super.onResume();
+        spSelectSize.setSelection(1);
     }
 
-    private void select(int x, int y) {
-        tiles[x][y].select(!tiles[x][y].selected());
-    }
 }

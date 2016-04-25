@@ -1,13 +1,9 @@
 package com.example.checkers;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
 import android.widget.ImageView;
-
-import java.util.Random;
 
 public class TileView extends ImageView {
 
@@ -32,6 +28,7 @@ public class TileView extends ImageView {
         center.setColor(0x400000ff);
         border.setColor(0xff0000ff);
         border.setStrokeWidth(3);
+        System.out.println(GameSettings.getInstance().getBoardSize());
     }
 
     @Override

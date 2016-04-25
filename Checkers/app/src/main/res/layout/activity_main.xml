@@ -7,22 +7,39 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="@drawable/wood"
+    android:background="@drawable/background_blue_small"
     tools:context="com.example.checkers.MainActivity" >
 
-    <GridView
-        android:id="@+id/gvChessBoard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        >
-    </GridView>
-
     <TextView
-        android:id="@+id/tvPosition"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_marginTop="20dp"
-        android:layout_below="@+id/gvChessBoard"
-        android:visibility="invisible"/>
+        android:id="@+id/tvSelectSize"
+        android:text="Board size: "
+        android:textColor="@color/black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:layout_marginRight="8sp"
+        android:layout_marginLeft="30sp"
+
+        android:layout_marginTop="60sp"
+        />
+
+    <Spinner
+        android:id="@+id/spSelectSize"
+        android:layout_toRightOf="@+id/tvSelectSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8sp"
+        android:layout_marginTop="60sp"
+        >
+    </Spinner>
+
+    <Button
+        android:id="@+id/btStartGame"
+        android:text="play"
+        android:layout_marginLeft="30sp"
+        android:layout_marginTop="30sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvSelectSize"/>
+
 </RelativeLayout>
