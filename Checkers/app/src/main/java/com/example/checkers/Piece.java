@@ -1,3 +1,5 @@
+package com.example.checkers;
+
 /**
  * Created by Joren on 20-Apr-16.
  */

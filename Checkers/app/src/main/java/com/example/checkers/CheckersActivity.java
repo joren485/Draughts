@@ -15,7 +15,8 @@ public class CheckersActivity extends AppCompatActivity {
     private static final int BEIGE = R.drawable.beige;
 
     private int columnAmount = 10;
-    private int rowsWithPiecesAmount = 3;
+
+    private Board board;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,25 +27,21 @@ public class CheckersActivity extends AppCompatActivity {
         setContentView(R.layout.activity_checkers);
 
         columnAmount = GameSettings.getInstance().getBoardSize();
-        rowsWithPiecesAmount = (columnAmount/2) - 1;
 
         initTiles();
-        initPieces();
+
+        board = new Board(columnAmount);
 
         GridView gvChessBoard = (GridView) findViewById(R.id.gvChessBoard);
-        CheckerBoardAdapter gaSquares = new CheckerBoardAdapter(this, tiles);
-
+        CheckerBoardAdapter gaSquares = new CheckerBoardAdapter(this, tiles, board);
 
         gvChessBoard.setNumColumns(columnAmount);
         gvChessBoard.setAdapter(gaSquares);
-        final TextView tvPosition = (TextView) findViewById(R.id.tvPosition);
 
         gvChessBoard.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                tvPosition.setText("Position: (" + (position/columnAmount + 1) + "," + (position%columnAmount + 1) + ")");
-                tvPosition.setVisibility(View.VISIBLE);
-                select(position / columnAmount, position % columnAmount);
+                gaSquares.click(position / columnAmount, position % columnAmount);
             }
         });
     }
@@ -59,18 +56,5 @@ public class CheckersActivity extends AppCompatActivity {
                 tiles[i][j] = tile;
             }
         }
-    }
-
-    private void initPieces() {
-        for (int i = 0; i < rowsWithPiecesAmount; i++) {
-            for (int j = i % 2; j < columnAmount; j += 2) {
-                tiles[i][columnAmount - j - 1].setOccupation(TileView.Occupation.BLACK);
-                tiles[columnAmount - i - 1][j].setOccupation(TileView.Occupation.WHITE);
-            }
-        }
-    }
-
-    private void select(int x, int y) {
-        tiles[x][y].select(!tiles[x][y].selected());
     }
 }

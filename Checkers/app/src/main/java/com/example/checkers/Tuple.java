@@ -1,3 +1,5 @@
+package com.example.checkers;
+
 public class Tuple {
 
     public final int x;

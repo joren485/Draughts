@@ -12,16 +12,15 @@ public class TileView extends ImageView {
     private final Paint center = new Paint();
     private final Paint border = new Paint();
     private boolean selected;
-
-    public enum Occupation {
-        BLACK, WHITE, EMPTY;
-    }
-
-    private Occupation currentOccupation;
+    private Tuple position;
+    private Piece pieces;
+    private Move move;
 
     public TileView(Context context, int background) {
         super(context);
-        currentOccupation = Occupation.EMPTY;
+
+
+
         setPadding(5, 5, 5, 5);
         selected = false;
         setBackgroundResource(background);
@@ -34,16 +33,6 @@ public class TileView extends ImageView {
     @Override
     public void onMeasure (int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, widthMeasureSpec);
-    }
-
-    public void setOccupation(Occupation occ) {
-        this.currentOccupation = occ;
-        if (occ == Occupation.BLACK)
-            this.setImageResource(BLACK_TILE);
-        else if (occ == Occupation.WHITE)
-            this.setImageResource(WHITE_TILE);
-        else
-            this.setImageResource(0);
     }
 
     public void select(boolean b) {
@@ -64,9 +53,5 @@ public class TileView extends ImageView {
             c.drawLine(1, getHeight() - 1, getWidth() - 1, getHeight() - 1, border);
             c.drawLine(getWidth() - 1, 1, getWidth() - 1, getHeight() - 1, border);
         }
-    }
-
-    public Occupation getOccupation() {
-        return currentOccupation;
     }
 }

@@ -1,3 +1,7 @@
+package com.example.checkers;
+
+import com.example.checkers.Tuple;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
