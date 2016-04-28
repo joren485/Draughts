@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Draughts</string>
+    <string-array name="board_sizes">
+        <item>8</item>
+        <item>10 (default)</item>
+        <item>12</item>
+    </string-array>
+
+    <integer-array name="board_sizes_nrs">
+        <item>8</item>
+        <item>10</item>
+        <item>12</item>
+    </integer-array>
+</resources>
