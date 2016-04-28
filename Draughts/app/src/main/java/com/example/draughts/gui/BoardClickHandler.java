@@ -30,6 +30,7 @@ public class BoardClickHandler {
         // For usability, clicks on white squares are ignored.
         // After all, only black squares can ever hold pieces
         if (isWhitePos(pos)) {
+            boardAdapter.deselectAll();
             return;
         }
 
