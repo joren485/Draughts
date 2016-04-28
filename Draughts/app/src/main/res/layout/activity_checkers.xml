@@ -10,26 +10,32 @@
     android:background="@drawable/background_blue_gradient"
     tools:context=".gui.GameActivity">
 
-    <GridView
-        android:id="@+id/gvChessBoard"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:listSelector="@android:color/transparent"
-        >
-    </GridView>
+        android:orientation="vertical"
+        android:id="@+id/main">
 
-    <TextView
-        android:id="@+id/tvGameStatus"
-        android:layout_width="match_parent"
-        android:gravity="center"
-        android:layout_height="wrap_content"
-        android:text="WHITE"
-        android:textSize="36sp"
-        android:typeface="sans"
-        android:textColor="@color/white"
-        android:layout_marginBottom="5sp"
-        android:layout_above="@id/gvChessBoard"/>
+        <TextView
+            android:id="@+id/tvGameStatus"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:text="WHITE"
+            android:textSize="36sp"
+            android:typeface="sans"
+            android:textColor="@color/white"
+            android:layout_marginBottom="5sp"/>
+
+        <GridView
+            android:id="@+id/gvChessBoard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:listSelector="@android:color/transparent"
+            >
+        </GridView>
+    </LinearLayout>
 
     <GridView
         android:id="@+id/whitePieces"
@@ -37,7 +43,7 @@
         android:layout_height="wrap_content"
         android:horizontalSpacing="5dp"
         android:verticalSpacing="5dp"
-        android:layout_above="@id/tvGameStatus"
+        android:layout_above="@id/main"
         />
     <GridView
         android:id="@+id/blackPieces"
@@ -46,6 +52,6 @@
         android:layout_marginTop="36dp"
         android:horizontalSpacing="5dp"
         android:verticalSpacing="5dp"
-        android:layout_below="@id/gvChessBoard"
+        android:layout_below="@id/main"
         />
 </RelativeLayout>
