@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#85F6FC</color>
+    <color name="colorPrimaryDark">#8987FF</color>
+    <color name="colorAccent">@color/white</color>
+    <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
+    <color name="centerSelected">#400000ff</color>
+    <color name="borderSelected">#ff0000ff</color>
+    <color name="centerCaptured">#50ff1814</color>
+    <color name="borderCaptured">#ffff1814</color>
+</resources>
