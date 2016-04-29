@@ -9,6 +9,9 @@ import com.example.draughts.game.Position;
 
 import java.util.List;
 
+/**
+ * Handles user presses on the board
+ */
 public class BoardClickHandler {
     private final Board board;
     private final BoardAdapter boardAdapter;
@@ -26,6 +29,10 @@ public class BoardClickHandler {
         blackCapturedPieces = blackPieces;
     }
 
+    /**
+     * Handle a click by the user
+     * @param pos the position the user clicked
+     */
     public void click(Position pos) {
         // For usability, clicks on white squares are ignored.
         // After all, only black squares can ever hold pieces
@@ -69,12 +76,10 @@ public class BoardClickHandler {
                     }
                 }
                 boardAdapter.updateAllTiles();
-                //boardAdapter.deselectTile(selectedPosition);
                 boardAdapter.deselectAll();
                 selectedPosition = null;
             } else
             {
-                //boardAdapter.deselectTile(selectedPosition);
                 boardAdapter.updateAllTiles();
                 boardAdapter.deselectAll();
                 selectedPosition = null;
@@ -84,6 +89,9 @@ public class BoardClickHandler {
         }
     }
 
+    /**
+     * Updates the text in the TextView that displays the game status
+     */
     private void updateStatusText() {
         Piece.Color playerColor = board.getTurnColor();
 

@@ -8,6 +8,9 @@ import android.widget.ImageView;
 import com.example.draughts.game.*;
 import com.example.draughts.R;
 
+/**
+ * View that displays a tile in the board.
+ */
 public class TileView extends ImageView {
     private static final int BLACK_PIECE = R.drawable.black_piece_transparent;
     private static final int WHITE_PIECE = R.drawable.white_piece_transparent;
@@ -78,16 +81,28 @@ public class TileView extends ImageView {
         super.onMeasure(widthMeasureSpec, widthMeasureSpec);
     }
 
+    /**
+     * Sets the selection state of this tile and forces it to redraw
+     * @param b new selection state
+     */
     public void select(boolean b) {
         this.selected = b;
         invalidate();
     }
 
+    /**
+     * Sets the capture state of this tile and forces it to redraw
+     * @param b new capture state
+     */
     public void setCaptured(boolean b) {
         this.captured = b;
         invalidate();
     }
 
+    /**
+     * Draws a blue square on top of a tile if it is selected, and a red tile if it is captured
+     * @param c canvas on which to draw
+     */
     protected void onDraw(Canvas c) {
         super.onDraw(c);
         if (selected) {

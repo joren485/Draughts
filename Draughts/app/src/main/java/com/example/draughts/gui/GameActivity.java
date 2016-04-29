@@ -13,22 +13,27 @@ import com.example.draughts.game.*;
 
 import com.example.draughts.R;
 
+/**
+ * Activity that handles the game
+ */
 public class GameActivity extends AppCompatActivity {
-//    private static final int BROWN = R.drawable.brown;
-//    private static final int BEIGE = R.drawable.beige;
 
-    private int boardSize = 10;
+    private int boardSize;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Set app fullscreen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_game);
 
+        // Retrieve board size from intent
         Intent intent = getIntent();
         boardSize = intent.getIntExtra("boardSize", 10);
 
+
+        // Initialize board, views and adapters
         final Board board = new Board(boardSize);
 
         final GridView gvChessBoard = (GridView) findViewById(R.id.gvChessBoard);

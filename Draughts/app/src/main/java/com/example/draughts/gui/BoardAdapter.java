@@ -9,7 +9,6 @@ import com.example.draughts.game.*;
 import com.example.draughts.R;
 
 /**
- * @author Marco Hernandez
  * An adapter that fills a gridview with a checkered beige-brown pattern.
  */
 public class BoardAdapter extends BaseAdapter{
@@ -32,11 +31,13 @@ public class BoardAdapter extends BaseAdapter{
                 tiles[y][x] = new TileView(context, (y + x) % 2 == 0 ? WHITE_TILE : BLACK_TILE,
                         new Position(x, y), board);
                 tiles[y][x].updatePiece();
-
             }
         }
     }
 
+    /**
+     * Updates all tiles
+     */
     public void updateAllTiles() {
         for(TileView[] row : tiles) {
             for(TileView tile : row) {
@@ -45,10 +46,17 @@ public class BoardAdapter extends BaseAdapter{
         }
     }
 
+    /**
+     * Selects a tile
+     * @param pos the position of the tile to be selected
+     */
     public void selectTile(Position pos) {
         tiles[pos.y][pos.x].select(true);
     }
 
+    /**
+     * Deselects all tiles
+     */
     public void deselectAll() {
         for (TileView[] tileArray : tiles) {
             for (TileView tile : tileArray) {

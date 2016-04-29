@@ -9,7 +9,7 @@ public class Piece {
 
     private boolean captured = false;
     private boolean king = false;
-    private MoveChain moveChain;
+    private MoveTree moveTree;
 
     private final Color color;
 
@@ -31,7 +31,7 @@ public class Piece {
         this.color = p.getColor();
         this.king = p.isKing();
         this.captured = p.captured;
-        this.moveChain = p.getMoveChain();
+        this.moveTree = p.getMoveTree();
     }
 
     public boolean isKing(){
@@ -46,10 +46,6 @@ public class Piece {
         return this.color;
     }
 
-    public void setCaptured(boolean captured){
-        this.captured = captured;
-    }
-
     public void switchCaptured(){
         this.captured = !this.captured;
     }
@@ -58,12 +54,12 @@ public class Piece {
         return this.captured;
     }
 
-    public void setMoveChain(MoveChain moveChain) {
-        this.moveChain = moveChain;
+    public void setMoveTree(MoveTree moveTree) {
+        this.moveTree = moveTree;
     }
 
-    public MoveChain getMoveChain() {
-        return this.moveChain;
+    public MoveTree getMoveTree() {
+        return this.moveTree;
     }
 
 

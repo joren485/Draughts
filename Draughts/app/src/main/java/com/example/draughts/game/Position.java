@@ -10,10 +10,6 @@ public class Position {
         this.y = y;
     }
 
-    public Position(Position t) {
-        this(t.x, t.y);
-    }
-
     public static Position getDirection(Position src, Position dest){
 
         return new Position((src.x < dest.x) ? 1 : -1, (src.y < dest.y) ? 1 : -1);
@@ -33,10 +29,5 @@ public class Position {
 
         return other_position.x == this.x && other_position.y == this.y;
 
-    }
-
-    @Override
-    public String toString(){
-        return "(" + this.x + "," + this.y + ")";
     }
 }

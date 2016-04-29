@@ -10,8 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Marco Hernandez
- * An adapter that fills a gridview with a checkered beige-brown pattern.
+ * An adapter that displays the pieces captured by each player.
  */
 public class CapturedPiecesAdapter extends BaseAdapter{
     private final Context context;
@@ -64,7 +63,9 @@ public class CapturedPiecesAdapter extends BaseAdapter{
         return mView;
     }
 
-
+    /**
+     * An ImageView that is automatically squared.
+     */
     private class SquareImageView extends ImageView {
         public SquareImageView(Context c) {
             super(c);

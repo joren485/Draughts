@@ -4,21 +4,46 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * The actual board, that has information on pieces and can calculate moves
+ */
 public class Board {
 
+    /**
+     * Possible move directions for a white pawn
+     */
     private static final Position[] WHITE_PAWN_MOVES
             = {new Position(1,-1), new Position(-1,-1)};
+
+    /**
+     * Possible move directions for a black pawn
+     */
     private static final Position[] BLACK_PAWN_MOVES
             = {new Position(1,1), new Position(-1,1)};
+
+    /**
+     * Possible move directions when capturing a piece
+     */
     private static final Position[] CAPTURE_MOVES
             = {new Position(1,1), new Position(1,-1), new Position(-1,1), new Position(-1,-1)};
+
+    /**
+     * Possible move directions for a black or white king
+     */
     private static final Position[] KING_DIRECTIONS = CAPTURE_MOVES;
 
 
     private final int board_size;
     private final Piece[][] board;
 
+    /**
+     * Remaining number of white pieces
+     */
     private int nr_white_pieces;
+
+    /**
+     * Remaining number of black pieces
+     */
     private int nr_black_pieces;
 
     private boolean gameOver = false;
@@ -26,8 +51,14 @@ public class Board {
 
     private Piece.Color currentPlayer = Piece.Color.White;
 
-    private MoveChain currentMoveChain;
+    /**
+     * The move chain corresponding to the current turn
+     */
+    private MoveTree currentMoveTree;
 
+    /**
+     * Piece captured this turn
+     */
     private Piece capturedPiece;
 
     public Board(int size){
@@ -70,20 +101,20 @@ public class Board {
             return;
         }
 
-        if (currentMoveChain == null) {
-            currentMoveChain = getPiece(from).getMoveChain();
+        if (currentMoveTree == null) {
+            currentMoveTree = getPiece(from).getMoveTree();
         }
 
         Piece capturedPiece = movePiece(from, destination);
-        currentMoveChain = currentMoveChain.getnextMovebySrc(destination);
+        currentMoveTree = currentMoveTree.getnextMovebySrc(destination);
 
-        if (currentMoveChain.isLeaf()) {
+        if (currentMoveTree.isLeaf()) {
             if (currentPlayer == Piece.Color.White && destination.y == 0
                     || currentPlayer == Piece.Color.Black && destination.y == (board_size - 1)) {
                 getPiece(destination).crown();
             }
 
-            currentMoveChain = null;
+            currentMoveTree = null;
         }
 
         this.capturedPiece = capturedPiece;
@@ -96,7 +127,7 @@ public class Board {
             }
         }
 
-        if (currentMoveChain == null) {
+        if (currentMoveTree == null) {
             killCapturedPieces();
 
             currentPlayer = (currentPlayer == Piece.Color.White)
@@ -120,15 +151,15 @@ public class Board {
             return new LinkedList<>();
         }
 
-        if (currentMoveChain != null) {
-            if (!currentMoveChain.getSrc().equals(pos)) {
+        if (currentMoveTree != null) {
+            if (!currentMoveTree.getSrcPos().equals(pos)) {
                 return new LinkedList<>();
             }
 
-            return currentMoveChain.getNextMoveChains();
+            return currentMoveTree.getNextMoveTrees();
         }
 
-        return getPiece(pos).getMoveChain().getNextMoveChains();
+        return getPiece(pos).getMoveTree().getNextMoveTrees();
     }
 
     /**
@@ -172,6 +203,11 @@ public class Board {
     public Piece.Color getTurnColor() {
         return currentPlayer;
     }
+
+    public Piece getCapturedPiece() {
+        return capturedPiece;
+    }
+
 
     /**
      * Get the color of the player that won the game, and null if the game isn't over yet.
@@ -246,7 +282,7 @@ public class Board {
     }
 
     /**
-     * MoveChain a piece to a location. It is assumed that the move is a valid one,
+     * MoveTree a piece to a location. It is assumed that the move is a valid one,
      * there are methods for all valid moves and captures.
      */
     private Piece movePiece(Position src, Position dest) {
@@ -274,6 +310,10 @@ public class Board {
         return null;
     }
 
+    /**
+     * @param from position from which to start
+     * @return all possible moves starting from position 'from', excluding captures
+     */
     private List<Position> getAllMoves(Position from) {
 
         if(this.isEmpty(from)) {
@@ -292,6 +332,11 @@ public class Board {
         }
     }
 
+    /**
+     * @param from position from which to start
+     * @param color color of the pawn at specified position
+     * @return all possible moves starting from position 'from', assuming the piece at 'from' is a pawn of color 'color'
+     */
     private List<Position> getAllMovesMan(Position from, Piece.Color color){
 
         Position[] move_directions = (color == Piece.Color.White) ? WHITE_PAWN_MOVES : BLACK_PAWN_MOVES;
@@ -352,6 +397,11 @@ public class Board {
         }
     }
 
+    /**
+     * @param from the position from which to start
+     * @param color the color of the piece at position 'from'
+     * @return all possible places a pawn can move to while capturing another piece, assuming the pawn has color 'color'
+     */
     private List<Position> getAllCapturesMan(Position from, Piece.Color color){
 
         List<Position> moves = new LinkedList<>();
@@ -413,14 +463,19 @@ public class Board {
         return possibleCaptures;
     }
 
-    private void getCaptureChain(Position src, MoveChain node){
+    /**
+     * Recursive function that constructs a recursive tree of possible moves.
+     * @param src position the piece currently occupies
+     * @param node currently evaluated root node
+     */
+    private void getCaptureChain(Position src, MoveTree node){
 
         List<Position> captures = getAllCaptures(src);
 
         for (Position dest : captures){
             movePiece(src, dest);
 
-            MoveChain branch = new MoveChain(dest);
+            MoveTree branch = new MoveTree(dest);
             getCaptureChain(dest, branch);
 
             node.addMove(branch);
@@ -428,27 +483,32 @@ public class Board {
         }
     }
 
-    private MoveChain getPossibleMoves(Position src){
+    /**
+     * Gets all possible moves for a piece starting from a position, taking the longest capture chain into account
+     * @param src position from which to start
+     * @return a list of possible positions the piece can move to
+     */
+    private MoveTree getPossibleMoves(Position src){
         List<Position> captures = getAllCaptures(src);
-        MoveChain root;
+        MoveTree root;
 
         if (captures.size() == 0) {
-            root = new MoveChain(src, false);
+            root = new MoveTree(src, false);
             for(Position position : getAllMoves(src)){
-                root.addMove(new MoveChain(position));
+                root.addMove(new MoveTree(position));
             }
             return root;
         }
 
-        root = new MoveChain(src, true);
+        root = new MoveTree(src, true);
         getCaptureChain(src, root);
 
         return root;
     }
 
     /**
-     *
-     * @return
+     * For each piece of the current player, sets the possible legal moves.
+     * @return True if the current player does not have any valid moves, otherwise false.
      */
     private boolean setAllMoves() {
 
@@ -463,10 +523,10 @@ public class Board {
                     Piece p = getPiece(pos);
 
                     if (p.getColor() == currentPlayer) {
-                        p.setMoveChain(getPossibleMoves(pos));
+                        p.setMoveTree(getPossibleMoves(pos));
 
-                        found_capture = found_capture || p.getMoveChain().isCapture();
-                        max_height = Math.max(max_height, p.getMoveChain().getHeight());
+                        found_capture = found_capture || p.getMoveTree().isCapture();
+                        max_height = Math.max(max_height, p.getMoveTree().getHeight());
                     }
                 }
             }
@@ -481,8 +541,8 @@ public class Board {
                         Piece p = getPiece(pos);
 
                         if (p.getColor() == currentPlayer) {
-                            if ((p.getMoveChain().getHeight() != max_height) || ! p.getMoveChain().isCapture()) {
-                                p.setMoveChain(new MoveChain(pos));
+                            if ((p.getMoveTree().getHeight() != max_height) || ! p.getMoveTree().isCapture()) {
+                                p.setMoveTree(new MoveTree(pos));
                             }
                         }
                     }
@@ -493,6 +553,9 @@ public class Board {
         return max_height <= 1;
     }
 
+    /**
+     * Remove all pieces captured in the last move.
+     */
     private void killCapturedPieces(){
         for (int y = 0; y < this.board_size; y++){
             for (int x = 0; x < this.board_size; x++) {
@@ -507,37 +570,5 @@ public class Board {
                 }
             }
         }
-    }
-
-    public Piece getCapturedPiece() {
-        return capturedPiece;
-    }
-
-    @Override
-    public String toString(){
-
-        Piece temp;
-        StringBuilder sb = new StringBuilder();
-
-        for (int y = 0; y < this.board_size; y++){
-            for (int x = 0; x < this.board_size; x++){
-                temp = this.board[x][y];
-
-                if (temp == null) {
-                    sb.append(" * ");
-                }
-
-                else if (temp.getColor() == Piece.Color.White){
-                    sb.append(" W ");
-                }
-                else {
-                    sb.append(" B ");
-                }
-            }
-
-            sb.append('\n');
-
-        }
-        return sb.toString();
     }
 }
