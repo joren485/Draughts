@@ -43,14 +43,15 @@ public class MainActivity extends AppCompatActivity {
                         int index = spSelectSize.getSelectedItemPosition();
                         if (index != Spinner.INVALID_POSITION) {
                             /**
-                             * Determine which board size the user has selected. Save in in GameSettings
+                             * Determine which board size the user has selected. Save in in intent
                              */
                             int boardSize = getResources().getIntArray(R.array.board_sizes_nrs)[index];
-                            GameSettings.getInstance().setBoardSize(boardSize);
+                            Intent checkersIntent = new Intent(v.getContext(), GameActivity.class);
+                            checkersIntent.putExtra("boardSize", boardSize);
+
                             /**
                              * Start a game of checkers with these settings.
                              */
-                            Intent checkersIntent = new Intent(v.getContext(), GameActivity.class);
                             startActivity(checkersIntent);
                         }
                     }

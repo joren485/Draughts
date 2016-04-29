@@ -1,5 +1,6 @@
 package com.example.draughts.gui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -23,11 +24,10 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_checkers);
+        setContentView(R.layout.activity_game);
 
-        GameSettings.getInstance().context = this;
-
-        boardSize = GameSettings.getInstance().getBoardSize();
+        Intent intent = getIntent();
+        boardSize = intent.getIntExtra("boardSize", 10);
 
         final Board board = new Board(boardSize);
 
